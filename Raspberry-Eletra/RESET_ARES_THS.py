@@ -4,7 +4,7 @@ from sys      import exc_info
 from os       import path
 from time     import sleep
 from textwrap import wrap
-import logging ,datetime,configparser
+import logging
 from termcolor import colored
 import tkinter as tk
 from tkinter import ttk
@@ -57,7 +57,7 @@ class App:
 
 
 
-class RS485_OPTICAL_UART_modbus_abnt14522(object):
+class RS485_OPTICAL_abnt14522(object):
 
     def __init__(self,uart_port:str,
                     baudrate:int,
@@ -133,17 +133,17 @@ class RS485_OPTICAL_UART_modbus_abnt14522(object):
             
         try:
             #   SERIAL CONFIG    
-            self.obj_serial                    = Serial(self.port)       # Porta serial a ser utilizada
-            self.obj_serial.baudrate           :int = baudrate           # Taxa de transmissão em bits por segundo
-            self.obj_serial.bytesize           :int = bytesize           # Número de bits de dados por byte (8 bits)
-            self.obj_serial.parity             :str = parity             # Tipo de paridade (nenhuma)
-            self.obj_serial.stopbits           :int = stopbits           # Número de bits de parada (1 bit)
-            self.obj_serial.timeout            = timeout                 # Tempo limite em segundos para a leitura da porta serial
-            self.obj_serial.write_timeout      = write_timeout           # Representa o tempo de espera em segundos para operações de escrita.
-            self.obj_serial.inter_byte_timeout = inter_byte_timeout      # Representa o tempo de espera em segundos entre bytes de dados recebidos
-            self.obj_serial.xonxoff            = xonxoff                 # Controle de fluxo XON/XOFF desativado
-            self.obj_serial.rtscts             = rtscts                  # Controle de fluxo RTS/CTS desativado
-            self.obj_serial.dsrdtr             = dsrdtr                  # Controle de fluxo DSR/DTR desativado
+            self.obj_serial                    = Serial(self.port)              # Porta serial a ser utilizada
+            self.obj_serial.baudrate           :int = baudrate                  # Taxa de transmissão em bits por segundo
+            self.obj_serial.bytesize           :int = bytesize                  # Número de bits de dados por byte (8 bits)
+            self.obj_serial.parity             :str = parity                    # Tipo de paridade (nenhuma)
+            self.obj_serial.stopbits           :int = stopbits                  # Número de bits de parada (1 bit)
+            self.obj_serial.timeout            = timeout                        # Tempo limite em segundos para a leitura da porta serial
+            self.obj_serial.write_timeout      = write_timeout                  # Representa o tempo de espera em segundos para operações de escrita.
+            self.obj_serial.inter_byte_timeout = inter_byte_timeout             # Representa o tempo de espera em segundos entre bytes de dados recebidos
+            self.obj_serial.xonxoff            = xonxoff                        # Controle de fluxo XON/XOFF desativado
+            self.obj_serial.rtscts             = rtscts                         # Controle de fluxo RTS/CTS desativado
+            self.obj_serial.dsrdtr             = dsrdtr                         # Controle de fluxo DSR/DTR desativado
             self.is_open                       : bool = self.obj_serial.is_open # Retorna se a porta serial esta open
 
 
@@ -206,38 +206,6 @@ class RS485_OPTICAL_UART_modbus_abnt14522(object):
             self.raise_or_print(line_number=int(exception_traceback.tb_lineno),err=str(err))
 
 
-    def calculate_crc16_modbus(self,input_data:bytes) -> hex:
-        try:
-            crc = 0xFFFF
-            for n in range(len(input_data)):
-                crc ^= input_data[n]
-                for i in range(8):
-                    if crc & 1:
-                        crc >>= 1
-                        crc ^= 0xA001
-                    else:
-                        crc >>= 1
-            
-            crc = hex(crc)
-            return  crc[4:6] + crc[2:4]
-        except Exception as err:
-            _, _, exception_traceback = exc_info()
-            self.raise_or_print(line_number=int(exception_traceback.tb_lineno),err=str(err))
-
-
-    def check_crc16_modbus(self,input_data:str) -> bool:
-        try:
-            data  = input_data[:-4]
-            crc_input_data = input_data[-4:]
-            crc_expected    = str(self.calculate_crc16_modbus(bytes.fromhex(str(data)))).upper()
-            if crc_expected == crc_input_data:
-                return True
-            return False
-        except Exception as err:
-            _, _, exception_traceback = exc_info()
-            self.raise_or_print(line_number=int(exception_traceback.tb_lineno),err=str(err))
-
-
     def check_crc16_abnt14522(self,input_data:str) -> bool:
         try:
             data  = input_data[:-4]
@@ -247,19 +215,6 @@ class RS485_OPTICAL_UART_modbus_abnt14522(object):
             if str(crc_expected).upper() == str(crc_input_data).upper():
                 return True
             return False
-        except Exception as err:
-            _, _, exception_traceback = exc_info()
-            self.raise_or_print(line_number=int(exception_traceback.tb_lineno),err=str(err))
-
-
-    def formate_response_modbus(self,response:str) -> str:
-        try:
-            register = response[8:-5]
-            register = register.replace(' ','')
-            result = wrap(register, 4)
-            is_par = True if len([el for el in result if  len(el) % 2 == 0  and len(el) >= 4]) == len(result) else False
-            if is_par:
-                return " ".join(result)
         except Exception as err:
             _, _, exception_traceback = exc_info()
             self.raise_or_print(line_number=int(exception_traceback.tb_lineno),err=str(err))
@@ -314,47 +269,6 @@ class RS485_OPTICAL_UART_modbus_abnt14522(object):
         except Exception as err:
             _, _, exception_traceback = exc_info()
             self.raise_or_print(line_number=int(exception_traceback.tb_lineno),err=str(err))
-
-
-
-    def UART_modbus_read_register(self,id:int,func:int,addr:int,num_reg) -> str:
-        try: 
-            message = bytearray([id, func])
-            message.extend(addr.to_bytes(2, byteorder='big'))
-            message.extend(num_reg.to_bytes(2, byteorder='big'))
-            message.extend(bytes.fromhex(self.calculate_crc16_modbus(bytes(message)).zfill(4)))
-            message = bytes(message)
-            expect_length =  int(num_reg) * 2  + 5
-
-            if self.UART_send(message):
-
-                response = self.UART_read(expect_length)
-                response_sem_space = self.formate_bytes(btarr=response,space=False)
-                response_com_space = self.formate_bytes(btarr=response,space=True)
-                response__correct = self.check_crc16_modbus(response_sem_space)
-                len_response_correct = True if  int(len(response_sem_space) / 2 ) == int(expect_length) else False           
-                
-                if not self.check_crc16:
-                    response__correct = True
-
-                if not self.check_length:
-                    len_response_correct = True
-
-                if response__correct:
-                    if len_response_correct:
-                        register = self.formate_response_modbus(response_com_space)
-                        if register:
-                            return  str(register)
-                        else :
-                            return False
-                    else:
-                        return False
-                return False
-                    
-        except Exception as err:
-            _, _, exception_traceback = exc_info()
-            self.raise_or_print(line_number=int(exception_traceback.tb_lineno),err=str(err))
-
 
     def optical_reading_code(self,code:int):
         try:
@@ -426,13 +340,13 @@ class RS485_OPTICAL_UART_modbus_abnt14522(object):
             #     display_list = [1,2,3,24,32,33]
 
             # if eqm_display_type == 2:
-            #     display_name = "solar"
-            #     display_list = [1,2,3,24,32,33,55]
-
-            # if eqm_display_type == 3:
             #     display_name = "cliente 2,5"
             #     display_list = [1,2,3,4,8,10,14,16,17,21,23,24,25,29,32,33,52,53,54,57,66,68,69,71,73,75,93]
             
+            # if eqm_display_type == 3:
+            #     display_name = "solar"
+            #     display_list = [1,2,3,24,32,33,55]
+
             if self.reset_ares8023() :
                 sleep(8)
                 self.tk_app.update_label(str('Seta o arquivo 01'))
@@ -563,10 +477,33 @@ class RS485_OPTICAL_UART_modbus_abnt14522(object):
                     self.UART_send(b'\x79\x12\x34\x56\x01\x01\x02\x03\x24\x32\x33\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xB4\x71')
                     self.UART_read(257)
                     self.obj_serial.setDTR(False)   
-                    # END
-                
-                # Display : solar  [1,2,3,24,32,33,55]
+                    # END             
+
+                # Display : cliente 2,5  [1,2,3,4,8,10,14,16,17,21,23,24,25,29,32,33,52,53,54,57,66,68,69,71,73,75,93]
                 if eqm_display_type == 2:
+                    # BEGIN
+                    self.tk_app.update_label(f'configura Display : cliente 2,5')
+                    sleep(0.5)
+                    self.obj_serial.setDTR(True)   
+                    sleep(1)
+                    self.UART_read(7)
+                    self.UART_send(b'\x79\x12\x34\x56\x00\x88\x01\x45\x02\x46\x03\x47\x04\x48\x49\x06\x08\x09\x90\x91\x92\x93\x50\x51\x52\x53\x10\x54\x55\x12\x56\x57\x14\x58\x15\x59\x16\xAF\x17\x19\x60\x61\x62\x63\x64\x21\x65\x22\x66\x23\x67\x24\x68\x25\x69\x27\x29\x70\x71\x72\x73\x30\x74\x00\x55\xFA')
+                    self.UART_read(257)
+                    self.obj_serial.setDTR(False)   
+                    # END
+                    # BEGIN
+                    self.tk_app.update_label(f'configura Display : cliente 2,5')
+                    sleep(0.5)
+                    self.obj_serial.setDTR(True)   
+                    sleep(1)
+                    self.UART_read(7)
+                    self.UART_send(b'\x79\x12\x34\x56\x00\x31\x75\x32\x76\x33\x77\x34\x78\x35\x79\x36\x37\x38\x39\x80\x81\x82\x83\x40\x84\x41\x85\x86\x43\x87\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x78\xCC')
+                    self.UART_read(257)
+                    self.obj_serial.setDTR(False)   
+                    # END
+
+                # Display : solar  [1,2,3,24,32,33,55]
+                if eqm_display_type == 3:
                     # BEGIN
                     self.tk_app.update_label(f'configura Display : solar')
                     sleep(0.5)
@@ -597,29 +534,6 @@ class RS485_OPTICAL_UART_modbus_abnt14522(object):
                     self.UART_read(257)
                     self.obj_serial.setDTR(False)   
                     # END
-
-                # Display : cliente 2,5  [1,2,3,4,8,10,14,16,17,21,23,24,25,29,32,33,52,53,54,57,66,68,69,71,73,75,93]
-                if eqm_display_type == 3:
-                    # BEGIN
-                    self.tk_app.update_label(f'configura Display : cliente 2,5')
-                    sleep(0.5)
-                    self.obj_serial.setDTR(True)   
-                    sleep(1)
-                    self.UART_read(7)
-                    self.UART_send(b'\x79\x12\x34\x56\x00\x88\x01\x45\x02\x46\x03\x47\x04\x48\x49\x06\x08\x09\x90\x91\x92\x93\x50\x51\x52\x53\x10\x54\x55\x12\x56\x57\x14\x58\x15\x59\x16\xAF\x17\x19\x60\x61\x62\x63\x64\x21\x65\x22\x66\x23\x67\x24\x68\x25\x69\x27\x29\x70\x71\x72\x73\x30\x74\x00\x55\xFA')
-                    self.UART_read(257)
-                    self.obj_serial.setDTR(False)   
-                    # END
-                    # BEGIN
-                    self.tk_app.update_label(f'configura Display : cliente 2,5')
-                    sleep(0.5)
-                    self.obj_serial.setDTR(True)   
-                    sleep(1)
-                    self.UART_read(7)
-                    self.UART_send(b'\x79\x12\x34\x56\x00\x31\x75\x32\x76\x33\x77\x34\x78\x35\x79\x36\x37\x38\x39\x80\x81\x82\x83\x40\x84\x41\x85\x86\x43\x87\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x78\xCC')
-                    self.UART_read(257)
-                    self.obj_serial.setDTR(False)   
-                    # END
                     # BEGIN
                     self.tk_app.update_label(f'configura Display : cliente 2,5')
                     sleep(0.5)
@@ -630,8 +544,6 @@ class RS485_OPTICAL_UART_modbus_abnt14522(object):
                     self.UART_read(257)
                     self.obj_serial.setDTR(False)   
                     # END
-
-
 
                 # BEGIN INICIALIZACAO
                 self.tk_app.update_label(f'INICIALIZA O MEDIDOR')
@@ -658,70 +570,3 @@ class RS485_OPTICAL_UART_modbus_abnt14522(object):
         except Exception as err:
             _, _, exception_traceback = exc_info()
             self.raise_or_print(line_number=int(exception_traceback.tb_lineno),err=str(err))
-
-
-try:
-
-    config = configparser.ConfigParser()
-    config.read_file(open(r'./include/config/config.ini'))
-
- 
-    lobj_config = {}
-
-    # lobj_config['uart_port']               = '/dev/ttyUSB0'
-    lobj_config['uart_port']                 = find_open_port()
-    # if  lobj_config['uart_port']  == None:
-    #     while True:
-    #         if find_open_port() == None:
-    #             tk_root = tk.Tk()
-    #             tk_app = App(tk_root)
-    #             tk_app.update_label(str('PORTA NÂO ESTÀ CONECTADA'))
-
-
-
-    lobj_config['baudrate']                = int(config.get('UART-Config', 'baudrate'))
-    lobj_config['bytesize']                = int(config.get('UART-Config', 'bytesize'))
-    lobj_config['parity']                  = str(config.get('UART-Config', 'parity'))
-    lobj_config['stopbits']                = int(config.get('UART-Config', 'stopbits'))
-    lobj_config['timeout']                 = int(config.get('UART-Config', 'timeout'))
-    lobj_config['write_timeout']           = None   if config.get('UART-Config', 'write_timeout')            == 'None'      else int(config.get('UART-Config', 'write_timeout') )
-    lobj_config['inter_byte_timeout']      = None   if config.get('UART-Config', 'inter_byte_timeout')       == 'None'      else int(config.get('UART-Config', 'inter_byte_timeout') )
-    lobj_config['xonxoff']                 = False  if config.get('UART-Config', 'xonxoff')                  == 'False'     else True
-    lobj_config['rtscts']                  = False  if config.get('UART-Config', 'rtscts')                   == 'False'     else True
-    lobj_config['dsrdtr']                  = False  if config.get('UART-Config', 'dsrdtr')                   == 'False'     else True
-    lobj_config['Log']                     = False  if config.get('UART-Config', 'Log')                      == 'False'     else True
-    lobj_config['Print']                   = False  if config.get('UART-Config', 'Print')                    == 'False'     else True
-    lobj_config['Raise']                   = False  if config.get('UART-Config', 'Raise')                    == 'False'     else True
-    lobj_config['check_crc16']             = False  if config.get('UART-Config', 'check_crc16')              == 'False'     else True   
-    lobj_config['check_length']            = False  if config.get('UART-Config', 'check_length')             == 'False'     else True   
-
-    obj_UART = RS485_OPTICAL_UART_modbus_abnt14522(
-                                            lobj_config['uart_port'],
-                                            lobj_config['baudrate'],
-                                            lobj_config['bytesize'],
-                                            lobj_config['parity'],
-                                            lobj_config['stopbits'],
-                                            lobj_config['timeout'],
-                                            lobj_config['write_timeout'],
-                                            lobj_config['inter_byte_timeout'],
-                                            lobj_config['xonxoff'],
-                                            lobj_config['rtscts'],
-                                            lobj_config['dsrdtr'],
-                                            lobj_config['Log'],
-                                            lobj_config['Print'],
-                                            lobj_config['Raise'],
-                                            lobj_config['check_crc16'],
-                                            lobj_config['check_length'])
-
-    # print(obj_UART.UART_abtn14522_read_register("00091227",14))
-    # obj_UART.UART_abtn14522_fake_read_register()
-    # print(obj_UART.optical_reading_code(code=21))
-    # obj_UART.reset_ares8023()
-    
-    obj_UART.set01file_ares8023(3)
-
-    # obj_UART.tk_root.mainloop()
-except Exception as err:
-    _, _, exception_traceback = exc_info()
-    line_number = exception_traceback.tb_lineno
-    print(f'LINE : {line_number}  -  {str(err)} ')
