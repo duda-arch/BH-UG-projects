@@ -1,0 +1,2 @@
+@echo off
+start cmd.exe /k "cd C:\Users\Thor\Desktop\BH-UG-projects\Raspberry-Eletra && python3 RESET_ARES_THS_ENERGY_CLIENTE-2-5.py"

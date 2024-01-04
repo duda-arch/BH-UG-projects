@@ -1,7 +1,7 @@
 from RESET_ARES_THS import RS485_OPTICAL_abnt14522,find_open_port,exc_info,App
 import configparser
 import tkinter as tk
-
+from time import sleep
 try:
 
     config = configparser.ConfigParser()
@@ -15,7 +15,8 @@ try:
                 tk_root = tk.Tk()
                 tk_app = App(tk_root)
                 tk_app.update_label(str('PORTA NÂO ESTÀ CONECTADA'))
-
+                sleep(1000)
+                break
 
 
     lobj_config['baudrate']                = int(config.get('UART-Config', 'baudrate'))

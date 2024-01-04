@@ -383,7 +383,7 @@ class RS485_OPTICAL_abnt14522(object):
                 self.obj_serial.read(20)
                 self.obj_serial.write(b'\x09\x03\x03\x03\x03\x03\x03\x03\x82\xF5\xF5\xBE\x39')
                 self.obj_serial.setDTR(True)   
-                sleep(1)
+                sleep(3)
                 self.obj_serial.read(12)
                 self.tk_app.update_label(f'Inicializa o medidor')
                 sleep(4)
@@ -570,3 +570,5 @@ class RS485_OPTICAL_abnt14522(object):
         except Exception as err:
             _, _, exception_traceback = exc_info()
             self.raise_or_print(line_number=int(exception_traceback.tb_lineno),err=str(err))
+
+

@@ -1,0 +1,2 @@
+@echo off
+start cmd.exe /k "C:\Users\Fabiana\Desktop\duda-arch repository\BH-UG-projects\Raspberry-Eletra && python3 RESET_ARES_THS_ENERGY_ATIVA.py"
