@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=RESET_SOLAR
+Exec=lxterminal -e sh -c "cd /usr/src/BH-UG-projects/Raspberry-Eletra && sudo python3 RESET_ARES_THS_ENERGY_SOLAR.py; bash"
+Terminal=false
+Icon=/usr/src/BH-UG-projects/Raspberry-Eletra/include/config/ares.png
