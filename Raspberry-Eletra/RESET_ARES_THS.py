@@ -383,7 +383,7 @@ class RS485_OPTICAL_abnt14522(object):
                 self.obj_serial.read(20)
                 self.obj_serial.write(b'\x09\x03\x03\x03\x03\x03\x03\x03\x82\xF5\xF5\xBE\x39')
                 self.obj_serial.setDTR(True)   
-                sleep(3)
+                sleep(1)
                 self.obj_serial.read(12)
                 self.tk_app.update_label(f'Inicializa o medidor')
                 sleep(4)
@@ -478,8 +478,7 @@ class RS485_OPTICAL_abnt14522(object):
                     self.UART_read(257)
                     self.obj_serial.setDTR(False)   
                     # END             
-
-                # Display : cliente 2,5  [1,2,3,4,8,10,14,16,17,21,23,24,25,29,32,33,52,53,54,57,66,68,69,71,73,75,93]
+                
                 if eqm_display_type == 2:
                     # BEGIN
                     self.tk_app.update_label(f'configura Display : cliente 2,5')
@@ -502,7 +501,7 @@ class RS485_OPTICAL_abnt14522(object):
                     self.obj_serial.setDTR(False)   
                     # END
 
-                # Display : solar  [1,2,3,24,32,33,55]
+
                 if eqm_display_type == 3:
                     # BEGIN
                     self.tk_app.update_label(f'configura Display : solar')
@@ -535,7 +534,7 @@ class RS485_OPTICAL_abnt14522(object):
                     self.obj_serial.setDTR(False)   
                     # END
                     # BEGIN
-                    self.tk_app.update_label(f'configura Display : cliente 2,5')
+                    self.tk_app.update_label(f'configura Display : solar')
                     sleep(0.5)
                     self.obj_serial.setDTR(True)   
                     sleep(1)
@@ -544,6 +543,7 @@ class RS485_OPTICAL_abnt14522(object):
                     self.UART_read(257)
                     self.obj_serial.setDTR(False)   
                     # END
+
 
                 # BEGIN INICIALIZACAO
                 self.tk_app.update_label(f'INICIALIZA O MEDIDOR')
@@ -564,7 +564,7 @@ class RS485_OPTICAL_abnt14522(object):
                     self.tk_app.update_label(f'OCORREU ALGUMA FALHA NO MEDIDOR ')
                     sleep(0.4)
                     self.tk_app.update_label(f'INICIANDO O PROCESSO NOVAMENTE')
-                    self.set01file_ares8023()
+                    self.set01file_ares8023(eqm_display_type)
 
 
         except Exception as err:
