@@ -334,44 +334,44 @@ class RS485_OPTICAL_abnt14522(object):
             _, _, exception_traceback = exc_info()
             self.raise_or_print(int(exception_traceback.tb_lineno),str(err),Str=True,Raise=False)
 
-    def setHourAndDate(self,hour):
+    def setHourAndDate(self):
         try:
             data_atual = datetime.datetime.now()
-            dia = data_atual.day
-            mes = str(data_atual.month).zfill(2)
-            ano = str(data_atual.year)[2:]  
+            dia_atual = str(data_atual.day).zfill(2)
+            mes_atual = str(data_atual.month).zfill(2)
+            ano_atual = str(data_atual.year)[2:]  
 
-            dia = bytes.fromhex(''.join([f'x{el}' for el in f'{str(dia)}']).replace('x', ''))
-            mes = bytes.fromhex(''.join([f'x{el}' for el in f'{str(mes)}']).replace('x', ''))
-            ano = bytes.fromhex(''.join([f'x{el}' for el in f'{str(ano)}']).replace('x', ''))
+            dia = bytes.fromhex(''.join([f'x{el}' for el in f'{(dia_atual)}']).replace('x', ''))
+            mes = bytes.fromhex(''.join([f'x{el}' for el in f'{str(mes_atual)}']).replace('x', ''))
+            ano = bytes.fromhex(''.join([f'x{el}' for el in f'{str(ano_atual)}']).replace('x', ''))
             
             
-            msg_hour = b'\x30\x11\x11\x11\x22' + bytes([hour]) + b'\x47\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            msg_hour = b'\x30\x11\x11\x11\x22\x44\x47\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
             msg_hour = msg_hour + self.calcula_crc16_abnt(msg_hour)
 
             msg_date = b'\x29\x12\x34\x56' + dia + mes  + ano + b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-            self.UART_send(msg_date)
+            msg_date = msg_date + self.calcula_crc16_abnt(msg_date)
 
-            # self.tk_app.update_label(str('Define o horario do medidor'))
-            # self.obj_serial.setDTR(True)   
-            # self.UART_read(5)
-            # self.UART_send(b'\x30\x11\x11\x11\x22' + bytes([hour]) + b'\x47\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
-            # self.UART_read(257)
-            # self.obj_serial.setDTR(False)   
-            # self.UART_send(b'\x06')
-            # self.obj_serial.setDTR(False) 
-            # self.tk_app.update_label(str('Define o data do medidor'))
-            # self.obj_serial.setDTR(True)   
-            # self.UART_read(5)
-            # self.UART_send(b'\x29\x12\x34\x56\x18\x02\x24\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x69\x8D')
-            # self.UART_read(257)
-            # self.obj_serial.setDTR(False)   
-            # self.UART_send(b'\x06')
-            # self.obj_serial.setDTR(False) 
+            self.tk_app.update_label(str('Define o horario do medidor'))
+            self.obj_serial.setDTR(True)   
+            self.UART_read(5)
+            self.UART_send(msg_hour)
+            self.UART_read(257)
+            self.obj_serial.setDTR(False)   
+            self.UART_send(b'\x06')
+            self.obj_serial.setDTR(False) 
+            self.tk_app.update_label(str('Define o data do medidor'))
+            self.obj_serial.setDTR(True)   
+            self.UART_read(5)
+            self.UART_send(msg_date)
+            self.UART_read(257)
+            self.obj_serial.setDTR(False)   
+            self.UART_send(b'\x06')
+            self.obj_serial.setDTR(False) 
             return True
         except Exception as err:
-            _, _, exception_traceback = exc_info()
-            self.raise_or_print(int(exception_traceback.tb_lineno),str(err),Str=True,Raise=False)
+            print(err)
+
 
     def set01file_ares8023(self,eqm_display_type):
         try:

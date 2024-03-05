@@ -54,7 +54,7 @@ try:
                                             lobj_config['check_length'])
     
     # obj_UART.set01file_ares8023(3)
-    obj_UART.setHourAndDate(23)
+    obj_UART.setHourAndDate()
     # print(obj_UART.UART_abtn14522_read_register("00091227",14))
     # obj_UART.UART_abtn14522_fake_read_register()
     # print(obj_UART.optical_reading_code(code=21))
