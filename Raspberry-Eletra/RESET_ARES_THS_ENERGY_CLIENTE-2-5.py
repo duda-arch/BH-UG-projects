@@ -53,7 +53,7 @@ try:
                                             lobj_config['check_crc16'],
                                             lobj_config['check_length'])
 
-    obj_UART.set01file_ares8023(2)
+    obj_UART.set01file_ares8023(2,True,True)
 
     # print(obj_UART.UART_abtn14522_read_register("00091227",14))
     # obj_UART.UART_abtn14522_fake_read_register()

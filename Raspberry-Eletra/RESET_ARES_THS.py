@@ -339,29 +339,37 @@ class RS485_OPTICAL_abnt14522(object):
             data_atual = datetime.datetime.now()
             dia_atual = str(data_atual.day).zfill(2)
             mes_atual = str(data_atual.month).zfill(2)
-            ano_atual = str(data_atual.year)[2:]  
+            ano_atual = str(data_atual.year)[2:]
+            dia_atual = str(data_atual.day).zfill(2)
+            hora_atual = str(data_atual.hour).zfill(2)
+            minuto_atual = str(data_atual.minute).zfill(2)
+            segundo_atual = str(data_atual.second).zfill(2)
 
             dia = bytes.fromhex(''.join([f'x{el}' for el in f'{(dia_atual)}']).replace('x', ''))
             mes = bytes.fromhex(''.join([f'x{el}' for el in f'{str(mes_atual)}']).replace('x', ''))
             ano = bytes.fromhex(''.join([f'x{el}' for el in f'{str(ano_atual)}']).replace('x', ''))
-            
-            
-            msg_hour = b'\x30\x11\x11\x11\x22\x44\x47\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
-            msg_hour = msg_hour + self.calcula_crc16_abnt(msg_hour)
 
-            msg_date = b'\x29\x12\x34\x56' + dia + mes  + ano + b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            hora = bytes.fromhex(''.join([f'x{el}' for el in f'{str(hora_atual)}']).replace('x', ''))
+            minuto = bytes.fromhex(''.join([f'x{el}' for el in f'{str(minuto_atual)}']).replace('x', ''))
+            segundo = bytes.fromhex(''.join([f'x{el}' for el in f'{str(segundo_atual)}']).replace('x', ''))
+
+            
+            
+            msg_hour = b'\x30\x11\x11\x11' + hora + minuto  + segundo + b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            msg_hour = msg_hour + self.calcula_crc16_abnt(msg_hour)
+            msg_date = b'\x29\x11\x11\x11' + dia + mes  + ano + b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
             msg_date = msg_date + self.calcula_crc16_abnt(msg_date)
 
             self.tk_app.update_label(str('Define o horario do medidor'))
             self.obj_serial.setDTR(True)   
-            self.UART_read(5)
+            sleep(1.4)
             self.UART_send(msg_hour)
             self.UART_read(257)
             self.obj_serial.setDTR(False)   
-            self.UART_send(b'\x06')
-            self.obj_serial.setDTR(False) 
-            self.tk_app.update_label(str('Define o data do medidor'))
+            sleep(1.4)
             self.obj_serial.setDTR(True)   
+            sleep(1.4)
+            self.tk_app.update_label(str('Define o data do medidor'))
             self.UART_read(5)
             self.UART_send(msg_date)
             self.UART_read(257)
@@ -373,7 +381,7 @@ class RS485_OPTICAL_abnt14522(object):
             print(err)
 
 
-    def set01file_ares8023(self,eqm_display_type):
+    def set01file_ares8023(self,eqm_display_type,bol_inicializa,bol_config_display):
         try:
             # if eqm_display_type == 1:
             #     display_name = "energia ativa"
@@ -388,6 +396,34 @@ class RS485_OPTICAL_abnt14522(object):
             #     display_list = [1,2,3,24,32,33,55]
 
             if self.reset_ares8023() :
+
+
+                data_atual = datetime.datetime.now()
+                dia_atual = str(data_atual.day).zfill(2)
+                mes_atual = str(data_atual.month).zfill(2)
+                ano_atual = str(data_atual.year)[2:]
+                dia_atual = str(data_atual.day).zfill(2)
+                hora_atual = str(data_atual.hour).zfill(2)
+                minuto_atual = str(data_atual.minute).zfill(2)
+                segundo_atual = str(data_atual.second).zfill(2)
+
+                dia = bytes.fromhex(''.join([f'x{el}' for el in f'{(dia_atual)}']).replace('x', ''))
+                mes = bytes.fromhex(''.join([f'x{el}' for el in f'{str(mes_atual)}']).replace('x', ''))
+                ano = bytes.fromhex(''.join([f'x{el}' for el in f'{str(ano_atual)}']).replace('x', ''))
+
+                hora = bytes.fromhex(''.join([f'x{el}' for el in f'{str(hora_atual)}']).replace('x', ''))
+                minuto = bytes.fromhex(''.join([f'x{el}' for el in f'{str(minuto_atual)}']).replace('x', ''))
+                segundo = bytes.fromhex(''.join([f'x{el}' for el in f'{str(segundo_atual)}']).replace('x', ''))
+
+            
+            
+                msg_hour = b'\x30\x11\x11\x11' + hora + minuto  + segundo + b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+                msg_hour = msg_hour + self.calcula_crc16_abnt(msg_hour)
+
+                msg_date = b'\x29\x12\x34\x56' + dia + mes  + ano + b'\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+                msg_date = msg_date + self.calcula_crc16_abnt(msg_date)
+
+
                 sleep(8)
                 self.tk_app.update_label(str('Seta o arquivo 01'))
                 self.obj_serial.setDTR(True)   
@@ -425,6 +461,10 @@ class RS485_OPTICAL_abnt14522(object):
                 self.obj_serial.setDTR(True)   
                 sleep(1)
                 self.obj_serial.read(12)
+                    
+                if bol_inicializa == False:
+                    return
+                
                 self.tk_app.update_label(f'Inicializa o medidor')
                 sleep(4)
 
@@ -433,8 +473,9 @@ class RS485_OPTICAL_abnt14522(object):
                 self.obj_serial.setDTR(True)   
                 sleep(1)
                 self.UART_read(5)
-                
-                self.UART_send(b'\x29\x12\x34\x56\x01\x01\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x6D\x18')
+
+                self.UART_send(msg_date)
+                # self.UART_send(b'\x29\x12\x34\x56\x01\x01\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x6D\x18') // 01 01 01 data
                 self.obj_serial.setDTR(True) 
                 self.UART_read(257)
                 sleep(0.3)
@@ -487,7 +528,7 @@ class RS485_OPTICAL_abnt14522(object):
                 # END HORA
 
                 # Display : energia ativa  [1,2,3,24,32,33]
-                if eqm_display_type == 1:
+                if eqm_display_type == 1 and bol_config_display:
                     # BEGIN
                     self.tk_app.update_label(f'configura Display : energia ativa')
                     sleep(0.5)
@@ -519,7 +560,7 @@ class RS485_OPTICAL_abnt14522(object):
                     self.obj_serial.setDTR(False)   
                     # END             
                 
-                if eqm_display_type == 2:
+                if eqm_display_type == 2 and bol_config_display:
                     # BEGIN
                     self.tk_app.update_label(f'configura Display : cliente 2,5')
                     sleep(0.5)
@@ -541,8 +582,7 @@ class RS485_OPTICAL_abnt14522(object):
                     self.obj_serial.setDTR(False)   
                     # END
 
-
-                if eqm_display_type == 3:
+                if eqm_display_type == 3 and bol_config_display:
                     # BEGIN
                     self.tk_app.update_label(f'configura Display : solar')
                     sleep(0.5)
@@ -595,11 +635,14 @@ class RS485_OPTICAL_abnt14522(object):
                 self.UART_read(257)
                 self.obj_serial.setDTR(False)   
                 # END INICIALIZACAO
+
+
                 self.tk_app.update_label(f'VERIFICA O MEDIDOR')
                 sleep(6)
 
                 if self.optical_reading_code(code=14):
                     self.tk_app.update_label(f'MEDIDOR RESETADO COM SUCESSO')
+                   
                 else:
                     self.tk_app.update_label(f'OCORREU ALGUMA FALHA NO MEDIDOR ')
                     sleep(0.4)
