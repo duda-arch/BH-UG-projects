@@ -463,6 +463,8 @@ class RS485_OPTICAL_abnt14522(object):
                 self.obj_serial.read(12)
                     
                 if bol_inicializa == False:
+                    self.tk_app.update_label(f'MEDIDOR EM MODO CONFIG')
+                    sleep(40)
                     return
                 
                 self.tk_app.update_label(f'Inicializa o medidor')
