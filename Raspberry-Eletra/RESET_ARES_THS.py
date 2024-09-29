@@ -348,7 +348,12 @@ class RS485_OPTICAL_abnt14522(object):
             
             # if eqm_display_type == 3:
             #     display_name = "solar"
-            #     display_list = [1,2,3,24,32,33,55],
+            #     display_list = [1,2,3,24,32,33,55]
+            
+            # if eqm_display_type == 4:
+            #     display_name = "solar"
+            #     display_list = [1,2,3,24,33,55,65]
+
 
             if self.reset_ares8023() :
                 data_atual = datetime.datetime.now()
@@ -360,6 +365,7 @@ class RS485_OPTICAL_abnt14522(object):
                 minuto_atual = str(data_atual.minute).zfill(2)
                 segundo_atual = str(data_atual.second).zfill(2)
 
+                
                 dia = bytes.fromhex(''.join([f'x{el}' for el in f'{(dia_atual)}']).replace('x', ''))
                 mes = bytes.fromhex(''.join([f'x{el}' for el in f'{str(mes_atual)}']).replace('x', ''))
                 ano = bytes.fromhex(''.join([f'x{el}' for el in f'{str(ano_atual)}']).replace('x', ''))
@@ -502,7 +508,7 @@ class RS485_OPTICAL_abnt14522(object):
                 self.UART_read(257)
                 self.obj_serial.setDTR(False)   
                 # END HORA
-
+                
                 # Display : energia ativa  [1,2,3,24,32,33]
                 if eqm_display_type == 1 and bol_config_display:
                     # BEGIN
@@ -611,6 +617,40 @@ class RS485_OPTICAL_abnt14522(object):
                     self.UART_read(257)
                     self.obj_serial.setDTR(False)   
                     # END
+                
+                # SOLAR 01_02_03_24_33_55_65
+                if eqm_display_type == 4 and bol_config_display:
+                    # BEGIN
+                    self.tk_app.update_label(f'configura Display : solar 01_02_03_24_33_55_65 ')
+                    sleep(0.5)
+                    self.obj_serial.setDTR(True)   
+                    sleep(1)
+                    self.UART_read(7)
+                    self.UART_send(b'\x79\x12\x34\x56\x00\x88\x01\x45\x02\x46\x03\x47\x04\x48\x49\x06\x08\x09\x90\x91\x92\x93\x50\x51\x52\x53\x10\x54\x55\x12\x56\x57\x14\x58\x15\x59\x16\xAF\x17\x19\x60\x61\x62\x63\x64\x21\x65\x22\x66\x23\x67\x24\x68\x25\x69\x27\x29\x70\x71\x72\x73\x30\x74\x00\x55\xFA')
+                    self.UART_read(257)
+                    self.obj_serial.setDTR(False)   
+                    # END
+                    # BEGIN
+                    self.tk_app.update_label(f'configura Display : solar 01_02_03_24_33_55_65')
+                    sleep(0.5)
+                    self.obj_serial.setDTR(True)   
+                    sleep(1)
+                    self.UART_read(7)
+                    self.UART_send(b'\x79\x12\x34\x56\x00\x31\x75\x32\x76\x33\x77\x34\x78\x35\x79\x36\x37\x38\x39\x80\x81\x82\x83\x40\x84\x41\x85\x86\x43\x87\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x78\xCC')
+                    self.UART_read(257)
+                    self.obj_serial.setDTR(False)   
+                    # END
+                    # BEGIN
+                    self.tk_app.update_label(f'configura Display : solar 01_02_03_24_33_55_65')
+                    sleep(0.5)
+                    self.obj_serial.setDTR(True)   
+                    sleep(1)
+                    self.UART_read(7)
+                    self.UART_send(b'\x79\x12\x34\x56\x01\x01\x02\x03\x24\x33\x55\x65\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xBA\xEE')
+                    self.UART_read(257)
+                    self.obj_serial.setDTR(False)   
+                    # END
+
 
                 # BEGIN INICIALIZACAO
                 self.tk_app.update_label(f'INICIALIZA O MEDIDOR')

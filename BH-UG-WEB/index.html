@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Projeto com Bootstrap 5.3.3</title>
+    <link rel="stylesheet" type="text/css" href="include/bootstrap-5.3.3/dist/css/bootstrap.min.css">
+</head>
+<style>
+    .hidden {
+        display: none;
+    }
+    
+</style>
+
+<body>
+    <div class="card container mt-5">
+        <h5 class="card-header">Manager</h5>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <div id="list-example" class="list-group">
+                        <a class="list-group-item list-group-item-action" href="#list-item-1">Cadastrar Usuarios</a>
+                        <a class="list-group-item list-group-item-action" href="#list-item-2">Gerenciar devices</a>
+                    </div>
+                </div>
+                <div class="col-8">
+                    <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
+                        <div id="list-item-1" class="card">
+                            <form action="index.html" method="post" onsubmit="return CreateUser();">
+                                <div id="list-item-1" class="card-body">
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-auto">
+                                            <label for="inputName" class="col-form-label">Nome</label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="text" id="inputName" class="form-control" value="">
+                                        </div>
+                                        <div class="col-auto">
+                                            <span id="passwordHelpInline" class="form-text">
+                                                Must be 8-20 characters long.
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-auto">
+                                            <label for="inputCreditos" class="col-form-label">Creditos</label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="number" id="inputCreditos" class="form-control" value="">
+                                        </div>
+                                        <div class="col-auto">
+                                            <span id="passwordHelpInline" class="form-text">
+                                                Somente numeros.
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success mt-2">Salvar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="scrollspy-example" tabindex="0">
+                            <div  class="col-8" id="list-item-2" style="display: none;">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Nome</th>
+                                            <th scope="col">Quantidade de créditos</th>
+                                            <th scope="col">Incluir créditos</th>
+                                            <th scope="col">Remover créditos</th>
+                                            <th scope="col">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">1</th>
+                                            <td>Usuário 1</td>
+                                            <td class="btn-warning btn-success ">5</td>
+                                            <td><input type="number" class="form-control incluir-creditos" value=""></td>
+                                            <td><input type="number" class="form-control remover-creditos" value=""></td>
+                                            <td><button type="submit" class="btn btn-success mt-2">Salvar</button></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">2</th>
+                                            <td >Usuário 2</td>
+                                            <td>7</td>
+                                            <td><input type="number" class="form-control incluir-creditos" value=""></td>
+                                            <td><input type="number" class="form-control remover-creditos" value=""></td>
+                                            <td><button type="submit" class="btn btn-success mt-2">Salvar</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        function CreateUser() {
+
+
+            var inputName = document.getElementById("inputName").value;
+            var inputCreditos = document.getElementById("inputCreditos").value;
+            console.log("Nome:", inputName);
+            console.log("Créditos:", inputCreditos);
+            if ( !inputName || !inputCreditos) {
+                alert("Por favor, preencha todos os campos!");
+                return false;
+            }
+        }
+
+        document.querySelectorAll('#list-example a').forEach(function (item) {
+            item.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                // Oculta todos os conteúdos
+                document.querySelectorAll('.scrollspy-example > div').forEach(function (content) {
+                    content.style.display = "none" ; 
+                });
+
+                // Obtém o ID do conteúdo a ser exibido
+                var targetId = this.getAttribute('href').substring(1); // Remove o #
+                console.log('Target ID:', targetId); // Verifique o ID alvo no console
+                var targetElement = document.getElementById(targetId);
+                targetElement.style.display = "" ; 
+            });
+        });
+
+    </script>
+    <!-- Bootstrap JS Local -->
+    <script src="include/bootstrap-5.3.3/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>

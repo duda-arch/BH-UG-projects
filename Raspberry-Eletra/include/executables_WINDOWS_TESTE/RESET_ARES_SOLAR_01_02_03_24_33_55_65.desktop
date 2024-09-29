@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=RESET_ARES_SOLAR
+Comment=Descriçao do Atalho
+Exec=python3 /home/mclovin/Área de Trabalho/duda-arch repository/BH-UG-projects/Raspberry-Eletra/RESET_ARES_THS_ENERGY_SOLAR_01_02_03_24_33_55_65.py
+Icon=/home/mclovin/Área de Trabalho/duda-arch repository/BH-UG-projects/Raspberry-Eletra/include/icons/ares_8023.png
+Terminal=false
+Type=Application
+Categories=Application;
